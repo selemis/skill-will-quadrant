@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  quadrant-generator:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./output:/app/output
+    command: --csv /app/data/employees.csv
