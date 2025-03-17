@@ -14,7 +14,7 @@ def create_skill_will_quadrant(employee_data, output_file='/app/output/skill_wil
     names, skill_score, will_scores, is_internal = _extract_employee_data(employee_data)
     ax = _setup_plot()
     _plot_employee(ax, employee_data)
-    _add_quadrant_labels(ax)
+    #_add_quadrant_labels(ax)
     _add_chart_labels(ax)
     _add_legend(ax)
     _save_chart(output_file)
@@ -38,6 +38,14 @@ def _setup_plot():
     # Set limits for both axes
     ax.set_xlim(-100, 100)
     ax.set_ylim(-100, 100)
+
+    # Hide the tick labels (numbers) on both axes
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+
+    # Hide the tick marks themselves
+    ax.set_xticks([])
+    ax.set_yticks([])
 
     # Add central grid lines
     ax.axhline(y=0, color='black', linestyle='-', alpha=0.5)
@@ -78,7 +86,7 @@ def _add_quadrant_labels(ax):
 def _add_chart_labels(ax):
     ax.set_xlabel('Will', fontsize=14)
     ax.set_ylabel('Skill', fontsize=14)
-    ax.set_title('Team Performance: Skill/Will Quadrant', fontsize=16)
+    ax.set_title('Skill/Will Quadrant', fontsize=16)
 
 def _add_legend(ax):
     internal_marker = plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Internal')
@@ -89,38 +97,34 @@ def _save_chart(output_file):
     plt.savefig(f'{output_file}.png', dpi=300, bbox_inches='tight')
     plt.savefig(f'{output_file}.pdf', bbox_inches='tight')
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate a Skill/Will Quadrant Chart')
-    parser.add_argument('--csv', help='Path to CSV file with employee data', default=None)
-    args = parser.parse_args()
+def read_csv_data(csv_path):
+    """Read employee data from a CSV file."""
+    import csv
+    employee_data = []
 
-    if args.csv:
-        import csv
-        employee_data = []
-        try:
-            with open(args.csv, 'r') as f:
-                reader = csv.reader(f)
-                header = next(reader, None)  # Skip header row if exists
-                for row in reader:
-                    if len(row) >= 4:
-                        name = row[0]
-                        skill = float(row[1])
-                        will = float(row[2])
-                        is_internal = row[3].lower() in ['true', 'yes', '1', 'internal']
-                        employee_data.append((name, skill, will, is_internal))
+    try:
+        with open(csv_path, 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader, None)  # Skip header row if exists
 
-            if not employee_data:
-                print("No valid data found in CSV. Using sample data.")
-                employee_data = get_sample_data()
+            for row in reader:
+                if len(row) >= 4:
+                    name = row[0]
+                    skill = float(row[1])
+                    will = float(row[2])
+                    is_internal = row[3].lower() in ['true', 'yes', '1', 'internal']
+                    employee_data.append((name, skill, will, is_internal))
 
-        except Exception as e:
-            print(f"Error reading CSV: {e}")
-            print("Using sample data instead.")
+        if not employee_data:
+            print("No valid data found in CSV. Using sample data.")
             employee_data = get_sample_data()
-    else:
+
+    except Exception as e:
+        print(f"Error reading CSV: {e}")
+        print("Using sample data instead.")
         employee_data = get_sample_data()
 
-    create_skill_will_quadrant(employee_data)
+    return employee_data
 
 def get_sample_data():
     # Sample data: (name, skill_score, will_score, is_internal)
@@ -132,3 +136,17 @@ def get_sample_data():
         ("Eve", 10, 20, False),
         ("Frank", -20, 30, False)
     ]
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Generate a Skill/Will Quadrant Chart')
+    parser.add_argument('--csv', help='Path to CSV file with employee data', default=None)
+    args = parser.parse_args()
+
+    # Get employee data from CSV or use sample data
+    if args.csv:
+        employee_data = read_csv_data(args.csv)
+    else:
+        employee_data = get_sample_data()
+
+    # Create the chart
+    create_skill_will_quadrant(employee_data)
