@@ -124,7 +124,6 @@ The docker-compose.yml file automatically:
 ![skill_will_quadrant_without_names](./images/skill_will_quadrant_without_names.png)
 
 
-
 ## Requirements
 
 -  Docker to run the containerized version
