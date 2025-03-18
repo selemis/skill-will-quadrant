@@ -14,7 +14,7 @@ def create_skill_will_quadrant(employee_data, output_file='/app/output/skill_wil
     names, skill_score, will_scores, is_internal = _extract_employee_data(employee_data)
     ax = _setup_plot()
     _plot_employee(ax, employee_data)
-    #_add_quadrant_labels(ax)
+    _add_quadrant_labels(ax)
     _add_chart_labels(ax)
     _add_legend(ax)
     _save_chart(output_file)
@@ -39,13 +39,7 @@ def _setup_plot():
     ax.set_xlim(-100, 100)
     ax.set_ylim(-100, 100)
 
-    # Hide the tick labels (numbers) on both axes
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-
-    # Hide the tick marks themselves
-    ax.set_xticks([])
-    ax.set_yticks([])
+    _hide_labels(ax)
 
     # Add central grid lines
     ax.axhline(y=0, color='black', linestyle='-', alpha=0.5)
@@ -136,6 +130,15 @@ def get_sample_data():
         ("Eve", 10, 20, False),
         ("Frank", -20, 30, False)
     ]
+
+def _hide_labels(ax):
+    # Hide the tick labels (numbers) on both axes
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+
+    # Hide the tick marks themselves
+    ax.set_xticks([])
+    ax.set_yticks([])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate a Skill/Will Quadrant Chart')
