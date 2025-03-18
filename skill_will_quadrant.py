@@ -72,10 +72,10 @@ def _plot_employee(ax, employee_data):
             externals.append((name, marker, color))
 
 def _add_quadrant_labels(ax):
-    ax.text(50, 50, "High Will\nHigh Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightgreen', alpha=0.3))
-    ax.text(-50, 50, "Low Will\nHigh Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightyellow', alpha=0.3))
-    ax.text(50, -50, "High Will\nLow Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightyellow', alpha=0.3))
-    ax.text(-50, -50, "Low Will\nLow Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightcoral', alpha=0.3))
+    ax.text(120, 50, "High Will\nHigh Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightgreen', alpha=0.3))
+    ax.text(-120, 50, "Low Will\nHigh Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightyellow', alpha=0.3))
+    ax.text(120, -50, "High Will\nLow Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightyellow', alpha=0.3))
+    ax.text(-120, -50, "Low Will\nLow Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightcoral', alpha=0.3))
 
 def _add_chart_labels(ax):
     ax.set_xlabel('Will', fontsize=14)
