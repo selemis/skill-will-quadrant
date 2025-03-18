@@ -11,15 +11,24 @@ def create_skill_will_quadrant(employee_data, output_file='/app/output/skill_wil
     - employee_data: List of tuples with (name, skill_score, will_score, is_internal)
     - output_file: Base name for the output file (without extension)
     """
+
     names, skill_score, will_scores, is_internal = _extract_employee_data(employee_data)
+    _create_chart(employee_data, f"{output_file}_with_names", name_handler=_add_name_labels)
+    _create_chart(employee_data, f"{output_file}_without_names", name_handler=None)
+
+
+def _add_name_labels(ax, name, will, skill):
+    ax.annotate(name, (will, skill), xytext=(5, 5), textcoords='offset points')
+
+def _create_chart(employee_data, output_file, name_handler=None):
     ax = _setup_plot()
-    _plot_employee(ax, employee_data)
+    _plot_employee(ax, employee_data, name_handler)
     _add_quadrant_labels(ax)
     _add_chart_labels(ax)
     _add_legend(ax)
     _save_chart(output_file)
-
     print(f"Chart saved as {output_file}.png and {output_file}.pdf")
+
     # Don't show the plot when running in Docker
     plt.close()
 
@@ -50,10 +59,7 @@ def _setup_plot():
 
     return ax
 
-def _plot_employee(ax, employee_data):
-    internals = []
-    externals = []
-
+def _plot_employee(ax, employee_data, name_handler=None):
     for name, skill, will, internal in employee_data:
         # Determine shape and color based on internal/external status
         marker = 'o' if internal else 's'  # Circle for internal, Square for external
@@ -62,14 +68,8 @@ def _plot_employee(ax, employee_data):
         # Plot the point
         ax.scatter(will, skill, s=100, marker=marker, color=color)
 
-        # Add the employee name as a label
-        ax.annotate(name, (will, skill), xytext=(5, 5), textcoords='offset points')
-
-        # Track employee types (for potential future use)
-        if internal:
-            internals.append((name, marker, color))
-        else:
-            externals.append((name, marker, color))
+        if name_handler:
+            name_handler(ax, name, will,skill)
 
 def _add_quadrant_labels(ax):
     ax.text(120, 50, "High Will\nHigh Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightgreen', alpha=0.3))
@@ -121,7 +121,6 @@ def read_csv_data(csv_path):
     return employee_data
 
 def get_sample_data():
-    # Sample data: (name, skill_score, will_score, is_internal)
     return [
         ("Alice", 80, 90, True),
         ("Bob", -30, 70, True),
@@ -145,11 +144,9 @@ if __name__ == "__main__":
     parser.add_argument('--csv', help='Path to CSV file with employee data', default=None)
     args = parser.parse_args()
 
-    # Get employee data from CSV or use sample data
     if args.csv:
         employee_data = read_csv_data(args.csv)
     else:
         employee_data = get_sample_data()
 
-    # Create the chart
     create_skill_will_quadrant(employee_data)
