@@ -1,7 +1,7 @@
-Name,Skill,Will,IsInternal
-Alice,80,90,true
-Bob,-30,70,true
-Charlie,60,-40,true
-Diana,-50,-60,true
-Eve,10,20,false
-Frank,-20,30,false
+Name,Skill,Will,PrevSkill,PrevWill,IsInternal
+Alice,80,90,70,80,true
+Bob,-30,70,-10,60,true
+Charlie,60,-40,30,-20,true
+Diana,-50,-60,-70,-80,true
+Eve,10,20,10,10,false
+Frank,-20,30,-30,10,false

@@ -12,13 +12,14 @@ def create_skill_will_quadrant(employee_data, output_file='/app/output/skill_wil
     - output_file: Base name for the output file (without extension)
     """
 
-    names, skill_score, will_scores, is_internal = _extract_employee_data(employee_data)
+    names, skill_score, will_scores, prev_skill_scores, prev_will_scores, is_internal = _extract_employee_data(employee_data)
     _create_chart(employee_data, f"{output_file}_with_names", name_handler=_add_name_labels)
     _create_chart(employee_data, f"{output_file}_without_names", name_handler=None)
 
 
-def _add_name_labels(ax, name, will, skill):
+def _add_name_labels(ax, name, will, skill, prev_will, prev_skill):
     ax.annotate(name, (will, skill), xytext=(5, 5), textcoords='offset points')
+    #do not annotate both nodes
 
 def _create_chart(employee_data, output_file, name_handler=None):
     ax = _setup_plot()
@@ -36,8 +37,10 @@ def _extract_employee_data(employee_data):
     names = [emp[0] for emp in employee_data]
     skill_scores = [emp[1] for emp in employee_data]
     will_scores = [emp[2] for emp in employee_data]
-    is_internal = [emp[3] for emp in employee_data]
-    return names, skill_scores, will_scores, is_internal
+    prev_skill_scores = [emp[3] for emp in employee_data]
+    prev_will_scores = [emp[4] for emp in employee_data]
+    is_internal = [emp[5] for emp in employee_data]
+    return names, skill_scores, will_scores, prev_skill_scores, prev_will_scores, is_internal
 
 def _setup_plot():
     # Create figure and axis
@@ -60,7 +63,7 @@ def _setup_plot():
     return ax
 
 def _plot_employee(ax, employee_data, name_handler=None):
-    for name, skill, will, internal in employee_data:
+    for name, skill, will, prev_skill, prev_will, internal in employee_data:
         # Determine shape and color based on internal/external status
         marker = 'o' if internal else 's'  # Circle for internal, Square for external
         color = 'blue' if internal else 'red'
@@ -68,8 +71,21 @@ def _plot_employee(ax, employee_data, name_handler=None):
         # Plot the point
         ax.scatter(will, skill, s=100, marker=marker, color=color)
 
+        # Plot the previous point with an arrow
+        if (prev_skill != skill or prev_will != will):
+            ax.annotate("",
+                xy=(will, skill),  # arrow tip
+                xytext=(prev_will, prev_skill),  # arrow base
+                arrowprops=dict(
+                    arrowstyle="->",
+                    color="gray" if internal else "darkred",
+                    lw=1.5,
+                    alpha=0.7
+                    )
+                )
+
         if name_handler:
-            name_handler(ax, name, will,skill)
+            name_handler(ax, name, will, skill, prev_skill, prev_will)
 
 def _add_quadrant_labels(ax):
     ax.text(120, 50, "High Will\nHigh Skill", ha='center', va='center', fontsize=12, bbox=dict(facecolor='lightgreen', alpha=0.3))
@@ -106,8 +122,10 @@ def read_csv_data(csv_path):
                     name = row[0]
                     skill = float(row[1])
                     will = float(row[2])
-                    is_internal = row[3].lower() in ['true', 'yes', '1', 'internal']
-                    employee_data.append((name, skill, will, is_internal))
+                    prev_skill = float(row[3])
+                    prev_will = float(row[4])
+                    is_internal = row[5].lower() in ['true', 'yes', '1', 'internal']
+                    employee_data.append((name, skill, will, prev_skill, prev_will, is_internal))
 
         if not employee_data:
             print("No valid data found in CSV. Using sample data.")
@@ -122,12 +140,12 @@ def read_csv_data(csv_path):
 
 def get_sample_data():
     return [
-        ("Alice", 80, 90, True),
-        ("Bob", -30, 70, True),
-        ("Charlie", 60, -40, True),
-        ("Diana", -50, -60, True),
-        ("Eve", 10, 20, False),
-        ("Frank", -20, 30, False)
+        ("Alice", 80, 90, 70, 80, True),
+        ("Bob", -30, 70, -10, 60, True),
+        ("Charlie", 60, -40, 30, -20, True),
+        ("Diana", -50, -60, -70, -80, True),
+        ("Eve", 10, 20, 10, 10, False),
+        ("Frank", -20, 30, -30, 10, False)
     ]
 
 def _hide_labels(ax):
