@@ -66,7 +66,7 @@ def _plot_employee(ax, employee_data, name_handler=None):
         color = 'blue' if internal else 'red'
 
         # Plot the point
-        ax.scatter(will, skill, s=100, marker=marker, color=color)
+        ax.scatter(will, skill, s=20, marker=marker, color=color)
 
         if name_handler:
             name_handler(ax, name, will,skill)
